@@ -1,8 +1,7 @@
 FROM node:boron
-
-RUN apt-get update -y
-RUN apt-get upgrade -y
-RUN apt-get install -y build-essential gcc g++ ca-certificates curl dos2unix
+RUN echo "deb http://ftp.fr.debian.org/debian jessie-backports main" >> /etc/apt/sources.list
+RUN apt-get update -y && apt-get upgrade -y
+RUN apt-get install -y --fix-missing build-essential gcc g++ ca-certificates curl dos2unix ffmpeg
 
 # Handle permissions issues on unix systems
 RUN gpg --keyserver ha.pool.sks-keyservers.net --recv-keys B42F6819007F00F88E364FD4036A9C25BF357DD4
@@ -14,7 +13,6 @@ RUN curl -o /usr/local/bin/gosu -SL "https://github.com/tianon/gosu/releases/dow
 
 RUN npm install -g nodemon typescript
 RUN mkdir -p /app
-
 COPY ./docker /var/docker
 RUN find /var/docker -name "*.sh" | xargs dos2unix
 

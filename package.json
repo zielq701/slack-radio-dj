@@ -25,6 +25,11 @@
   "author": "Patryk Zieliński",
   "license": "MIT",
   "devDependencies": {
+    "@types/body-parser": "^1.16.3",
+    "@types/express": "^4.0.35",
+    "@types/mongodb": "^2.2.2",
+    "@types/reflect-metadata": "0.0.5",
+    "@types/request": "0.0.43",
     "@types/chai": "^3.5.2",
     "@types/mocha": "^2.2.41",
     "@types/node": "^7.0.13",
@@ -38,5 +43,17 @@
     "ts-node": "^3.0.2",
     "tslint": "^5.1.0",
     "typescript": "^2.3.2"
+  },
+  "dependencies": {
+    "body-parser": "^1.17.2",
+    "express": "^4.15.3",
+    "mongodb": "^2.2.27",
+    "parse-iso-duration": "^1.0.0",
+    "reflect-metadata": "^0.1.10",
+    "request": "^2.81.0",
+    "rxjs": "^5.4.0",
+    "slackbots": "^1.0.2",
+    "socket.io": "^2.0.1",
+    "youtube-dl": "^1.11.1"
   }
 }

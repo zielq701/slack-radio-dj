@@ -33,3 +33,7 @@ testem.log
 # System Files
 .DS_Store
 Thumbs.db
+/src/public/songs/*
+!/src/public/songs/.gitkeep
+/data
+config.ts

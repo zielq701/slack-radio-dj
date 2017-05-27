@@ -1,0 +1,16 @@
+import * as path from 'path';
+
+export const appConfig = {
+  defaultRadioStreamUrl: 'http://radio.stream.url',
+  googleApiKey: 'xxxxxxxx-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxx',
+  maxSongDuration: 5 * 60 * 1000,
+  slackBot: {
+    token: 'xoxb-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx',
+    name: 'MusicBot'
+  },
+  slackBotConfig: {
+    icon_emoji: ':notes:'
+  },
+  songsDirectory: path.join(__dirname, 'public', 'songs'),
+  songsUrl: 'songs'
+};

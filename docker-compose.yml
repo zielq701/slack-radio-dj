@@ -1,13 +1,12 @@
 version: '3.0'
 services:
-  ts-starter:
+  slack-radio:
     container_name: slack-radio
     build:
       dockerfile: Dockerfile
       context: ./
     environment:
       - NODE_ENV=development
-    restart: unless-stopped
     env_file:
       - ./.env
     volumes:
@@ -17,3 +16,24 @@ services:
       - 58586:58586
       - 58585:58585
       - 8888:8888
+    depends_on:
+      - sr-mongo
+    networks:
+      sr_net:
+        ipv4_address: 126.126.1.1
+
+  sr-mongo:
+    container_name: sr-mongo
+    image: mongo:3.4.3
+    ports:
+      - 27117:27017
+    volumes:
+      - ./data/mongodb:/data/db
+    networks:
+      sr_net:
+        ipv4_address: 126.126.1.2
+
+networks:
+  sr_net:
+    external:
+      name: SrNetwork

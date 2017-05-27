@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>SlackRadio</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.0.1/socket.io.slim.js"></script>
+</head>
+<body>
+<div id="current"></div>
+<script>
+  var socket = io('localhost:8888');
+  var audio = null;
+
+  var player = document.getElementById('current');
+
+  socket.on('audioUrl', function (data) {
+    console.log(data);
+    player.innerHTML = '';
+    var audio = document.createElement('AUDIO');
+    audio.setAttribute('autoplay', true);
+    audio.setAttribute('controls', true);
+    audio.src = data;
+    player.appendChild(audio);
+
+  });
+</script>
+</body>
+</html>
