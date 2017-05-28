@@ -13,6 +13,11 @@ import * as fs from 'fs';
 export class SongService {
   private static async downloadSong(songMetadata: SongMetadata): Promise<Song> {
     return new Promise<Song>((resolve, reject) => {
+      const duration = parseIsoDuration(songMetadata.contentDetails.duration);
+      if (duration > appConfig.maxSongDurationToDownload) {
+        return reject('Song is to long');
+      }
+
       ytdl.exec(`https://www.youtube.com/watch?v=${songMetadata.id}`, [
         '--restrict-filenames',
         '-o', path.join(appConfig.songsDirectory, songMetadata.id + '.%(ext)s'),
@@ -22,8 +27,6 @@ export class SongService {
         if (err) {
           return reject(err);
         }
-
-        const duration = parseIsoDuration(songMetadata.contentDetails.duration);
 
         const song = new Song(duration, songMetadata.id, songMetadata.snippet.title);
         song.save();

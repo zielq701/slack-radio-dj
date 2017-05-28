@@ -49,7 +49,7 @@ export class PlayerComponent {
       playlist: this.playlist
     });
 
-    const duration = song.duration > appConfig.maxSongDuration ? appConfig.maxSongDuration : song.duration;
+    const duration = song.duration > appConfig.maxSongDurationToPlay ? appConfig.maxSongDurationToPlay : song.duration;
 
     this.timeout = new Stopwatch(() => {
       if (this.playlist.length) {
