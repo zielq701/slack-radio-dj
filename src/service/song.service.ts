@@ -8,6 +8,7 @@ import { SongMetadata } from '../interface/song-metadata.interface';
 import * as ytdl from 'youtube-dl';
 import * as path from 'path';
 import * as parseIsoDuration from 'parse-iso-duration';
+import * as fs from 'fs';
 
 export class SongService {
   private static async downloadSong(songMetadata: SongMetadata): Promise<Song> {
@@ -19,8 +20,7 @@ export class SongService {
         '--audio-format', 'mp3'
       ], {}, function (err, output) {
         if (err) {
-          reject(err);
-          return;
+          return reject(err);
         }
 
         const duration = parseIsoDuration(songMetadata.contentDetails.duration);
@@ -28,7 +28,7 @@ export class SongService {
         const song = new Song(duration, songMetadata.id, songMetadata.snippet.title);
         song.save();
 
-        return song;
+        resolve(song);
       });
     });
   }
@@ -50,6 +50,15 @@ export class SongService {
   static async getSong(url: Url): Promise<Song> {
     const params = querystring.parse(url.query);
     let song = await Song.findOne<Song | null>({youtubeId: params.v});
+
+    if (song && !fs.existsSync(song.filePath)) {
+      try {
+        await Song.remove(song._id);
+        song = null;
+      } catch (e) {
+        console.log(e);
+      }
+    }
 
     return new Promise<Song>(async (resolve, reject) => {
       if (song) {

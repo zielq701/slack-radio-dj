@@ -24,8 +24,8 @@ export class SlackComponent {
         this.player.addSong(song);
         this.slackBot.postMessage(data.channel, 'Twoja pioseneczka została dodana do playlisty!', this.botConfig);
       } catch (e) {
+        this.slackBot.postMessage(data.channel, `Coś poszło nie tak :(`, this.botConfig);
         console.log(e);
-        this.slackBot.postMessage(data.channel, `Coś poszło nie tak :( [${e}]`, this.botConfig);
       }
     }
   }

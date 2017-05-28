@@ -1,5 +1,4 @@
 import { Utils } from '../utils/utils';
-import { ObjectID } from 'mongodb';
 import { MongoDBConnection } from '../db/connection';
 
 const propertyDecoratorKey = '__ModelProp__';
@@ -42,7 +41,7 @@ export function ModelProp(type?: any): PropertyDecorator {
 
 export abstract class Model {
   @ModelProp()
-  protected _id: string;
+  _id: string;
 
   constructor() {
     if (!(<any>this.constructor).__collection__) {
@@ -169,7 +168,7 @@ export abstract class Model {
     const collection = (<any>this).__collection__;
 
     return new Promise<T>((resolve, reject) => {
-      db.collection(collection).find({_id: new ObjectID(id)}).limit(1).toArray((error, find) => {
+      db.collection(collection).find({_id: id}).limit(1).toArray((error, find) => {
         if (error) { return reject(error); }
         resolve(<T>(<any>this).deserialize(find.length ? find[0] : null));
       });
@@ -181,7 +180,7 @@ export abstract class Model {
     const collection = (<any>this).__collection__;
 
     return new Promise<T>((resolve, reject) => {
-      db.collection(collection).deleteOne({_id: new ObjectID(id)}, (error, remove) => {
+      db.collection(collection).deleteOne({_id: id}, (error, remove) => {
         if (error) { return reject(error); }
         resolve((<any>this).deserialize(remove));
       });
