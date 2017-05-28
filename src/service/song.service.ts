@@ -48,19 +48,24 @@ export class SongService {
   }
 
   static async getSong(url: Url): Promise<Song> {
-    const params = querystring.parse(url.query);
-    let song = await Song.findOne<Song | null>({youtubeId: params.v});
-
-    if (song && !fs.existsSync(song.filePath)) {
-      try {
-        await Song.remove(song._id);
-        song = null;
-      } catch (e) {
-        console.log(e);
-      }
-    }
-
     return new Promise<Song>(async (resolve, reject) => {
+      const params = querystring.parse(url.query);
+
+      if (!params.v) {
+        return reject('Bad url');
+      }
+
+      let song = await Song.findOne<Song | null>({youtubeId: params.v});
+
+      if (song && !fs.existsSync(song.filePath)) {
+        try {
+          await Song.remove(song._id);
+          song = null;
+        } catch (e) {
+          console.log(e);
+        }
+      }
+
       if (song) {
         return resolve(song);
       }
