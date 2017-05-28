@@ -11,6 +11,21 @@ export const appConfig = {
   slackBotConfig: {
     icon_emoji: ':notes:'
   },
+  slackBotMessages: {
+    addSongToQueueError: [
+      'Niestety coś poszło nie tak :sob:. Sprawdź link i spróbuj ponownie.',
+      'Ups, coś poszło nie tak :sob:. Czy aby na pewno dostałem dobry link?'
+    ],
+    songAddedToQueue: [
+      'Niedługo zagram Twoją pioseneczkę :grinning:!',
+      'Dodałem Twoją nutkę do playlisty :blush:!',
+      'Ty to jednak masz gust :wink:',
+      'Aż tak Ci się to wkręciło :stuck_out_tongue_closed_eyes:? Będzie grane :wink:!',
+      'Chyba mamy podobne gusta muzyczne, z chęcią to zagram :wink:',
+      'Dobry wybór, tłum oszaleje :laughing:',
+      'Dodałem ten utwór do playlisty :upside_down_face:'
+    ]
+  },
   songsDirectory: path.join(__dirname, 'public', 'songs'),
   songsUrl: 'songs'
 };

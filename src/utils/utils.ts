@@ -83,4 +83,8 @@ export class Utils {
       return value instanceof Array;
     }
   }
+
+  static drawRandomElementFromArray(arr: any[]): any {
+    return arr[Math.floor(Math.random() * arr.length)];
+  }
 }

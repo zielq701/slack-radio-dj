@@ -3,6 +3,7 @@ import { appConfig } from '../config';
 import { SongService } from '../service/song.service';
 import { Song } from '../model/song.model';
 import { PlayerComponent } from './player.component';
+import { Utils } from '../utils/utils';
 
 export class SlackComponent {
   constructor(private slackBot: any, private player: PlayerComponent, public botConfig = appConfig.slackBotConfig) {
@@ -22,9 +23,15 @@ export class SlackComponent {
       try {
         song = await SongService.getSong(parsed);
         this.player.addSong(song);
-        this.slackBot.postMessage(data.channel, 'Twoja pioseneczka została dodana do playlisty!', this.botConfig);
+        this.slackBot.postMessage(
+          data.channel,
+          Utils.drawRandomElementFromArray(appConfig.slackBotMessages.songAddedToQueue),
+          this.botConfig);
       } catch (e) {
-        this.slackBot.postMessage(data.channel, `Coś poszło nie tak :(`, this.botConfig);
+        this.slackBot.postMessage(
+          data.channel,
+          Utils.drawRandomElementFromArray(appConfig.slackBotMessages.addSongToQueueError),
+          this.botConfig);
         console.log(e);
       }
     }
