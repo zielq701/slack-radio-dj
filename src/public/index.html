@@ -6,22 +6,45 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.0.1/socket.io.slim.js"></script>
 </head>
 <body>
-<div id="current"></div>
+<div id="current" style="display: none"></div>
+<h3>Now playing: <span id="title"></span></h3>
+<h4>Songs queue:</h4>
+<ul id="playlist">
+</ul>
 <script>
   var socket = io('localhost:8888');
-  var audio = null;
 
   var player = document.getElementById('current');
+  var title = document.getElementById('title');
+  var playlist = document.getElementById('playlist');
 
-  socket.on('audioUrl', function (data) {
+  function generatePlaylist(songsPlaylist) {
+    var i;
+    var playlistHtml = '';
+
+    for (i = 0; i < songsPlaylist.length; i++) {
+      playlistHtml += '<li>' + songsPlaylist[i].title + '</li>';
+    }
+
+    playlist.innerHTML = playlistHtml;
+  }
+
+  socket.on('playlistUpdate', function (data) {
     console.log(data);
+    generatePlaylist(data);
+  });
+
+  socket.on('playerState', function (playerState) {
+    console.log(playerState);
     player.innerHTML = '';
     var audio = document.createElement('AUDIO');
+    audio.currentTime = Math.ceil(playerState.time / 1000);
     audio.setAttribute('autoplay', true);
     audio.setAttribute('controls', true);
-    audio.src = data;
+    audio.src = playerState.url;
     player.appendChild(audio);
-
+    generatePlaylist(playerState.playlist);
+    title.innerHTML = playerState.currentSong ? playerState.currentSong.title : playerState.url;
   });
 </script>
 </body>

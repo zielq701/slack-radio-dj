@@ -5,10 +5,10 @@ import { AppRouter } from './router';
 import { SlackRadioServer } from './core/server';
 
 import * as SlackBot from 'slackbots';
-import { PlayerComponent } from './component/player.component';
+import { PlayerComponent, PlayerState } from './component/player.component';
 import { SlackComponent } from './component/slack.component';
 
-let lastUrl;
+let lastPlayerState: PlayerState;
 
 const server = new SlackRadioServer();
 AppRouter.init(server.app);
@@ -16,13 +16,18 @@ server.start();
 
 const player = new PlayerComponent();
 
-player.currentSong$.subscribe(url => {
-  lastUrl = url;
-  server.io.emit('audioUrl', url);
+player.currentSong$.subscribe(playerState => {
+  lastPlayerState = playerState;
+  server.io.emit('playerState', playerState);
+});
+
+player.playlist$.subscribe(playlist => {
+  server.io.emit('playlistUpdate', playlist);
 });
 
 server.io.on('connection', function (socket) {
-  socket.emit('audioUrl', lastUrl);
+  lastPlayerState.time = player.getCurrentTime();
+  socket.emit('playerState', lastPlayerState);
 });
 
 const slack = new SlackComponent(new SlackBot(appConfig.slackBot), player);
