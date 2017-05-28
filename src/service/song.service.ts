@@ -40,8 +40,8 @@ export class SongService {
     return new Promise<SongMetadata>((resolve, reject) => {
       request.get(`https://www.googleapis.com/youtube/v3/videos?id=${songId}&part=contentDetails,snippet&key=${appConfig.googleApiKey}`,
         (err, res) => {
-          if (res.statusCode !== 204 && res.statusCode !== 200) {
-            reject('Invalid googleApiKey or song\'s id');
+          if ((res.statusCode !== 204 && res.statusCode !== 200) || JSON.parse(res.body).pageInfo.totalResults === 0) {
+            return reject('Invalid googleApiKey or song\'s id');
           }
 
           const songMetadataResponse = <SongMetadataResponse>JSON.parse(res.body);
