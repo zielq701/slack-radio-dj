@@ -34,6 +34,8 @@ export class SlackComponent {
           this.botConfig);
         console.log(e);
       }
+    } else if (data.text === ':-1:') {
+      this.player.downVoteCurrentSong(data.user);
     }
   }
 }

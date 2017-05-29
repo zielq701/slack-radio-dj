@@ -21,14 +21,30 @@ export class PlayerComponent {
     playlist: [],
     currentSong: null
   });
+  private currentSongThumbsDown: string[] = [];
+  private currentSongThumbsDownSubject = new BehaviorSubject<number>(this.currentSongThumbsDown.length);
   private playlist: Song[] = [];
   private playlistSubject = new BehaviorSubject<Song[]>(this.playlist);
 
   currentSong$: Observable<PlayerState> = this.currentSongSubject;
+  currentSongThumbsDown$: Observable<number> = this.currentSongThumbsDownSubject;
   playlist$: Observable<Song[]> = this.playlistSubject;
 
   getCurrentTime(): number {
     return this.timeout ? this.timeout.timeLeft() : 0;
+  }
+
+  playDefaultRadioStream(): void {
+    this.timeout = null;
+    this.currentSongSubject.next({
+      url: appConfig.defaultRadioStreamUrl,
+      time: 0,
+      currentSong: null,
+      playlist: this.playlist
+    });
+    this.currentSongUrl = appConfig.defaultRadioStreamUrl;
+    this.currentSongThumbsDown = [];
+    this.currentSongThumbsDownSubject.next(this.currentSongThumbsDown.length);
   }
 
   play(song: Song): void {
@@ -55,16 +71,30 @@ export class PlayerComponent {
       if (this.playlist.length) {
         this.play(this.playlist[0]);
       } else {
-        this.timeout = null;
-        this.currentSongSubject.next({
-          url: appConfig.defaultRadioStreamUrl,
-          time: 0,
-          currentSong: null,
-          playlist: this.playlist
-        });
-        this.currentSongUrl = appConfig.defaultRadioStreamUrl;
+        this.playDefaultRadioStream();
       }
     }, duration);
+
+    this.currentSongThumbsDown = [];
+    this.currentSongThumbsDownSubject.next(this.currentSongThumbsDown.length);
+  }
+
+  downVoteCurrentSong(uid: string): void {
+    if (this.currentSongThumbsDown.indexOf(uid) !== -1 || this.currentSongUrl === appConfig.defaultRadioStreamUrl) {
+      return;
+    }
+
+    this.currentSongThumbsDown.push(uid);
+    this.currentSongThumbsDownSubject.next(this.currentSongThumbsDown.length);
+
+    if (this.currentSongThumbsDown.length >= appConfig.thumbsDownToSkipSong) {
+      this.currentSongThumbsDown = [];
+      if (this.playlist.length) {
+        this.play(this.playlist[0]);
+      } else {
+        this.playDefaultRadioStream();
+      }
+    }
   }
 
   addSong(song: Song): void {

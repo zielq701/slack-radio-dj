@@ -7,16 +7,29 @@
 </head>
 <body>
 <div id="current" style="display: none"></div>
-<h3>Now playing: <span id="title"></span></h3>
+<button id="play">Play / Pause</button>
+<h3><img src="thumb-down-20x20.png"><span id="thumbs-down" style="font-size: 12px;"></span> Now playing: <span id="title"></span></h3>
 <h4>Songs queue:</h4>
 <ul id="playlist">
 </ul>
 <script>
   var socket = io('localhost:8888');
+  var playing = true;
 
   var player = document.getElementById('current');
   var title = document.getElementById('title');
   var playlist = document.getElementById('playlist');
+  var thumbs = document.getElementById('thumbs-down');
+
+  var playButton = document.getElementById('play');
+  playButton.addEventListener('click', function () {
+    playing = !playing;
+    if (!playing) {
+      player.innerHTML = '';
+    } else {
+      socket.emit('getCurrentPlayerState');
+    }
+  });
 
   function generatePlaylist(songsPlaylist) {
     var i;
@@ -36,15 +49,22 @@
 
   socket.on('playerState', function (playerState) {
     console.log(playerState);
-    player.innerHTML = '';
-    var audio = document.createElement('AUDIO');
-    audio.currentTime = Math.ceil(playerState.time / 1000);
-    audio.setAttribute('autoplay', true);
-    audio.setAttribute('controls', true);
-    audio.src = playerState.url;
-    player.appendChild(audio);
+    if (playing) {
+      player.innerHTML = '';
+      var audio = document.createElement('AUDIO');
+      audio.currentTime = Math.ceil(playerState.time / 1000);
+      audio.setAttribute('autoplay', true);
+      audio.setAttribute('controls', true);
+      audio.src = playerState.url;
+      player.appendChild(audio);
+    }
     generatePlaylist(playerState.playlist);
     title.innerHTML = playerState.currentSong ? playerState.currentSong.title : playerState.url;
+  });
+
+  socket.on('thumbsDown', function (thumbsDown) {
+    console.log(thumbsDown);
+    thumbs.innerHTML = thumbsDown.toString();
   });
 </script>
 </body>
