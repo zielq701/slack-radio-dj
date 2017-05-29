@@ -20,6 +20,7 @@ export class SongService {
 
       ytdl.exec(`https://www.youtube.com/watch?v=${songMetadata.id}`, [
         '--restrict-filenames',
+        '--geo-bypass-country', 'PL',
         '-o', path.join(appConfig.songsDirectory, songMetadata.id + '.%(ext)s'),
         '--extract-audio',
         '--audio-format', 'mp3'
