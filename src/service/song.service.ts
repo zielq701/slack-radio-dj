@@ -9,8 +9,21 @@ import * as ytdl from 'youtube-dl';
 import * as path from 'path';
 import * as parseIsoDuration from 'parse-iso-duration';
 import * as fs from 'fs';
+import { exec } from 'child_process';
 
 export class SongService {
+  private static async normalizeMp3(songPath: string): Promise<void> {
+    return new Promise<void>((resolve, reject) => {
+      exec(`mp3gain -c -p -r -d ${appConfig.mp3normalizationDb - 89} ${songPath}`, function (error, stdout, stderr) {
+        if (error) {
+          reject(error);
+        }
+
+        resolve();
+      });
+    });
+  }
+
   private static async downloadSong(songMetadata: SongMetadata): Promise<Song> {
     return new Promise<Song>((resolve, reject) => {
       const duration = parseIsoDuration(songMetadata.contentDetails.duration);
@@ -24,12 +37,19 @@ export class SongService {
         '-o', path.join(appConfig.songsDirectory, songMetadata.id + '.%(ext)s'),
         '--extract-audio',
         '--audio-format', 'mp3'
-      ], {}, function (err, output) {
+      ], {}, async (err, output) => {
         if (err) {
           return reject(err);
         }
 
         const song = new Song(duration, songMetadata.id, songMetadata.snippet.title);
+
+        try {
+          await SongService.normalizeMp3(song.filePath);
+        } catch (e) {
+          console.log(e);
+        }
+
         song.save();
 
         resolve(song);

@@ -3,6 +3,7 @@ import * as path from 'path';
 export const appConfig = {
   defaultRadioStreamUrl: 'http://radio.stream.url',
   googleApiKey: 'xxxxxxxx-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxx',
+  mp3normalizationDb: 97,
   maxSongDurationToPlay: 6 * 60 * 1000,
   maxSongDurationToDownload: 10 * 60 * 1000,
   slackBot: {

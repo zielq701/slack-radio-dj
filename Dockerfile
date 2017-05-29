@@ -15,6 +15,9 @@ RUN npm install -g nodemon typescript
 RUN mkdir -p /app
 COPY ./docker /var/docker
 RUN find /var/docker -name "*.sh" | xargs dos2unix
+WORKDIR /opt
+RUN curl -L http://ftp.pl.debian.org/debian/pool/main/m/mp3gain/mp3gain_1.5.2-r2-2+deb7u1_amd64.deb > mp3gain.deb
+RUN dpkg -i mp3gain.deb
 
 WORKDIR /app
 
