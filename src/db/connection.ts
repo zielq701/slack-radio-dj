@@ -1,29 +1,34 @@
 import { Db, MongoClient } from 'mongodb';
-
-const url = 'mongodb://126.126.1.2/songs';
+import { appConfig } from '../config';
+import { Observable } from 'rxjs/Observable';
+import { Subject } from 'rxjs/Subject';
 
 export class MongoDBConnection {
   private static isConnected = false;
   private static db: Db;
 
-  static async getConnection(): Promise<Db> {
-    return new Promise<Db>((resolve, reject) => {
-      if (this.isConnected) {
-        resolve(this.db);
-      } else {
-        this.connect((error, db: Db) => {
-          if (error) {
-            reject(error);
-          } else {
-            resolve(this.db);
-          }
-        });
-      }
-    });
+  static getConnection(): Observable<Db> {
+    const subject = new Subject<Db>();
+
+    if (this.isConnected) {
+      subject.next(this.db);
+      subject.complete();
+    } else {
+      this.connect((error, db: Db) => {
+        if (error) {
+          subject.error(error);
+        } else {
+          subject.next(db);
+          subject.complete();
+        }
+      });
+    }
+
+    return subject;
   }
 
   private static connect(result: (error, db: Db) => void): void {
-    MongoClient.connect(url, (error, db: Db) => {
+    MongoClient.connect(appConfig.mongoDb, (error, db: Db) => {
       this.db = db;
       this.isConnected = true;
 

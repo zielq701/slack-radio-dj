@@ -4,42 +4,27 @@ import { appConfig } from './config';
 import { AppRouter } from './router';
 import { SlackRadioServer } from './core/server';
 
-import * as SlackBot from 'slackbots';
-import { PlayerComponent, PlayerState } from './component/player.component';
-import { SlackComponent } from './component/slack.component';
-
-let lastPlayerState: PlayerState;
-let lastThumbsDown: number;
+import * as Slackbots from 'slackbots';
+import { Player } from './player/player';
+import { SlackBot } from './slackbot/slackbot';
+import { PlayerEvent } from './player/player-event';
+import { EventTypes } from './player/player.events';
 
 const server = new SlackRadioServer();
 AppRouter.init(server.app);
 server.start();
 
-const player = new PlayerComponent();
+const player = new Player();
+const bot = new SlackBot(new Slackbots(appConfig.slackBot), player);
+let lastEvent;
 
-player.currentSong$.subscribe(playerState => {
-  lastPlayerState = playerState;
-  server.io.emit('playerState', playerState);
-});
-
-player.playlist$.subscribe(playlist => {
-  server.io.emit('playlistUpdate', playlist);
-});
-
-player.currentSongThumbsDown$.subscribe(thumbsDown => {
-  lastThumbsDown = thumbsDown;
-  console.log(thumbsDown);
-  server.io.emit('thumbsDown', thumbsDown);
+player.playerEvents$.subscribe(event => {
+  lastEvent = event;
+  server.io.emit('PLAYER_ACTION', event);
 });
 
 server.io.on('connection', function (socket) {
-  lastPlayerState.time = player.getCurrentTime();
-  socket.emit('playerState', lastPlayerState);
-  socket.emit('thumbsDown', lastThumbsDown);
-  socket.on('getCurrentPlayerState', () => {
-    lastPlayerState.time = player.getCurrentTime();
-    socket.emit('playerState', lastPlayerState);
-  });
+  lastEvent.state.time = player.getCurrentTime();
+  socket.emit('PLAYER_ACTION', lastEvent);
 });
 
-const slack = new SlackComponent(new SlackBot(appConfig.slackBot), player);

@@ -42,6 +42,10 @@
     playlist.innerHTML = playlistHtml;
   }
 
+  socket.on('PLAYER_ACTION', function (data) {
+    console.log(data);
+  });
+
   socket.on('playlistUpdate', function (data) {
     console.log(data);
     generatePlaylist(data);

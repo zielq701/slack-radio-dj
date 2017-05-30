@@ -1,4 +1,4 @@
-export interface SongMetadata {
+export interface VideoMetadata {
   kind: string;
   etag: string;
   id: string;
